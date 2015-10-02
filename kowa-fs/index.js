@@ -164,12 +164,8 @@ KowaFs.closeAsync = function(fd) {
 KowaFs.existsAsync = function(path) {
   return new Promise(
     function(resolve, reject) {
-      fs.exists(path, function (err) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
+      fs.exists(path, function (exists) {
+        resolve(exists);
       });
     }
   );
@@ -206,11 +202,11 @@ KowaFs.fchownAsync = function(fd, uid, gid) {
 KowaFs.fstatAsync = function(fd) {
   return new Promise(
     function(resolve, reject) {
-      fs.fstat(fd, function (err) {
+      fs.fstat(fd, function (err, stats) {
         if (err) {
           reject(err);
         } else {
-          resolve();
+          resolve(stats);
         }
       });
     }
@@ -304,11 +300,11 @@ KowaFs.linkAsync = function(srcpath, dstpath) {
 KowaFs.lstatAsync = function(path) {
   return new Promise(
     function(resolve, reject) {
-      fs.lstat(path, function (err) {
+      fs.lstat(path, function (err, stats) {
         if (err) {
           reject(err);
         } else {
-          resolve();
+          resolve(stats);
         }
       });
     }
@@ -332,11 +328,11 @@ KowaFs.mkdirAsync = function(path, mode) {
 KowaFs.openAsync = function(path, flags, mode) {
   return new Promise(
     function(resolve, reject) {
-      fs.open(path, flags, mode, function (err) {
+      fs.open(path, flags, mode, function (err, fd) {
         if (err) {
           reject(err);
         } else {
-          resolve();
+          resolve(fd);
         }
       });
     }
@@ -346,10 +342,14 @@ KowaFs.openAsync = function(path, flags, mode) {
 KowaFs.readAsync = function(fd, buffer, offset, length, position) {
   return new Promise(
     function(resolve, reject) {
-      fs.read(fd, buffer, offset, length, position, function (err) {
+      fs.read(fd, buffer, offset, length, position, function (err, bytesRead, buffer) {
         if (err) {
           reject(err);
         } else {
+          var ret = { 
+            bytesRead: bytesRead,
+            buffer: buffer,
+          };
           resolve();
         }
       });
@@ -360,11 +360,11 @@ KowaFs.readAsync = function(fd, buffer, offset, length, position) {
 KowaFs.readFileAsync = function(filename, options) {
   return new Promise(
     function(resolve, reject) {
-      fs.readFile(filename, options, function (err) {
+      fs.readFile(filename, options, function (err, data) {
         if (err) {
           reject(err);
         } else {
-          resolve();
+          resolve(data);
         }
       });
     }
@@ -374,11 +374,11 @@ KowaFs.readFileAsync = function(filename, options) {
 KowaFs.readdirAsync = function(path) {
   return new Promise(
     function(resolve, reject) {
-      fs.readdir(path, function (err) {
+      fs.readdir(path, function (err, files) {
         if (err) {
           reject(err);
         } else {
-          resolve();
+          resolve(files);
         }
       });
     }
@@ -388,11 +388,11 @@ KowaFs.readdirAsync = function(path) {
 KowaFs.readlinkAsync = function(path) {
   return new Promise(
     function(resolve, reject) {
-      fs.readlink(path, function (err) {
+      fs.readlink(path, function (err, linkString) {
         if (err) {
           reject(err);
         } else {
-          resolve();
+          resolve(linkString);
         }
       });
     }
@@ -402,11 +402,11 @@ KowaFs.readlinkAsync = function(path) {
 KowaFs.realpathAsync = function(path, cache) {
   return new Promise(
     function(resolve, reject) {
-      fs.realpath(path, cache, function (err) {
+      fs.realpath(path, cache, function (err, resolvedPath) {
         if (err) {
           reject(err);
         } else {
-          resolve();
+          resolve(resolvedPath);
         }
       });
     }
@@ -444,11 +444,11 @@ KowaFs.rmdirAsync = function(path) {
 KowaFs.statAsync = function(path) {
   return new Promise(
     function(resolve, reject) {
-      fs.stat(path, function (err) {
+      fs.stat(path, function (err, stats) {
         if (err) {
           reject(err);
         } else {
-          resolve();
+          resolve(stats);
         }
       });
     }
@@ -514,17 +514,21 @@ KowaFs.utimesAsync = function(path, atime, mtime) {
 KowaFs.writeAsync = function(fd, buffer, offset, length, position) {
   return new Promise(
     function(resolve, reject) {
-      fs.write(fd, buffer, offset, length, position, function (err) {
+      fs.write(fd, buffer, offset, length, position, function (err, written, buffer) {
         if (err) {
           reject(err);
         } else {
-          resolve();
+          var ret = { 
+            written: written,
+            buffer: buffer,
+          };
+          resolve(ret);
         }
       });
     }
   );
 };
-
+/*
 KowaFs.writeAsync = function(fd, data, position, encoding) {
   return new Promise(
     function(resolve, reject) {
@@ -538,7 +542,7 @@ KowaFs.writeAsync = function(fd, data, position, encoding) {
     }
   );
 };
-
+*/
 KowaFs.writeFileAsync = function(filename, data, options) {
   return new Promise(
     function(resolve, reject) {
